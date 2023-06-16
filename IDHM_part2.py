@@ -19,6 +19,19 @@ df_idhm_esp = pd.read_csv('IDHM_ESP.csv')
 #Titulo de Página
 st.title('IDHM-SP: Índice de Desenvolvimento Humano do Estado de São Paulo')
 
+#Carregando os dados
+df = pd.DataFrame(df_idhm_esp)
+#Sidebar
+
+st.sidebar.header('Filtros')
+classes = st.sidebar.multiselect(
+    'Selecione as classes',
+    options = df_idhm_esp['classe'].unique(),
+)
+
+#Vinculo com os gráficos
+df_selecao = df_idhm_esp.query('classe == @classes')
+
 # Layout do aplicativo
 tab0, tab1, tab2, tab3, tab4 = st.tabs(["Geral","IDHM", "IDHM - Escolaridade", "IDHM - Longevidade", "IDHM - Renda"])
 
@@ -40,35 +53,35 @@ with tab0:
     O IDHM brasileiro segue as mesmas três dimensões do IDH Global - longevidade, educação e renda, mas vai além: adequa a metodologia global ao contexto brasileiro e à disponibilidade de indicadores nacionais. Embora meçam os mesmos fenômenos, os indicadores levados em conta no IDHM são mais adequados para avaliar o desenvolvimento dos municípios brasileiros. Assim, o IDHM - incluindo seus três componentes, IDHM Longevidade, IDHM Educação e IDHM Renda - conta um pouco da história dos municípios em três importantes dimensões do desenvolvimento humano durantes duas décadas da história brasileira.
     '''
     #DataFrame
-    df = pd.DataFrame(df_idhm_esp)
+
     st.dataframe(df, use_container_width=True)
     # Gráfico pairplot (Descobrir)
     st.markdown('Pairplot')
-    st.pyplot(sns.pairplot(df_idhm_esp, hue = 'classe'))
+    st.pyplot(sns.pairplot(df_selecao, hue = 'classe'))
 
 with tab1:
     
     #boxsplot
-    fig1 = px.box(df_idhm_esp, y='idhm', color = 'classe')
+    fig1 = px.box(df_selecao, y='idhm', color = 'classe')
     fig1.update_layout(title_text="Boxsplot IDHM")
     st.plotly_chart(fig1,  use_container_width = True)
     
     #Grafico Donut
-    fig5 = go.Figure(go.Pie(labels=df_idhm_esp['classe'], values=df_idhm_esp['idhm'], hole = 0.5))
+    fig5 = go.Figure(go.Pie(labels=df_selecao['classe'], values=df_selecao['idhm'], hole = 0.5))
     fig5.update_layout(title_text="IDHM Estado de São Paulo")
     st.plotly_chart(fig5,  use_container_width = True)
 
 with tab2:
     #Boxsplot
-    fig2 = px.box(df_idhm_esp, y='idhm_educacao', color = 'classe')
+    fig2 = px.box(df_selecao, y='idhm_educacao', color = 'classe')
     fig2.update_layout(title_text="Boxsplot IDHM com o indicador de Educação")
     st.plotly_chart(fig2,  use_container_width = True)
 
     #Grafico Donut
     #IDHM - Escolaridade
     fig6 = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]])
-    fig6.add_trace(go.Pie(labels=df_idhm_esp['classe'], values=df_idhm_esp['idhm'], name="IDHM"), 1, 1)
-    fig6.add_trace(go.Pie(labels=df_idhm_esp['classe'], values=df_idhm_esp['idhm_educacao'], name="IDHM Escolaridade"), 1, 2)
+    fig6.add_trace(go.Pie(labels=df_selecao['classe'], values=df_selecao['idhm'], name="IDHM"), 1, 1)
+    fig6.add_trace(go.Pie(labels=df_selecao['classe'], values=df_selecao['idhm_educacao'], name="IDHM Escolaridade"), 1, 2)
     # Tamanho do buraco da rosca
     fig6.update_traces(hole=0.7, hoverinfo="label+percent+name")
 
@@ -81,14 +94,14 @@ with tab2:
 
 with tab3:
     #Boxsplot
-    fig3 = px.box(df_idhm_esp, y='idhm_longevidade', color = 'classe')
+    fig3 = px.box(df_selecao, y='idhm_longevidade', color = 'classe')
     fig3.update_layout(title_text="Boxsplot IDHM com o indicador de Longevidade")
     st.plotly_chart(fig3,  use_container_width = True)
     #Donut
     fig7 = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]])
-    fig7.add_trace(go.Pie(labels=df_idhm_esp['classe'], values=df_idhm_esp['idhm'], name="IDHM"),
+    fig7.add_trace(go.Pie(labels=df_selecao['classe'], values=df_selecao['idhm'], name="IDHM"),
                 1, 1)
-    fig7.add_trace(go.Pie(labels=df_idhm_esp['classe'], values=df_idhm_esp['idhm_longevidade'], name="IDHM Longevidade"),
+    fig7.add_trace(go.Pie(labels=df_selecao['classe'], values=df_selecao['idhm_longevidade'], name="IDHM Longevidade"),
                 1, 2)
 
     # Tamanho do buraco da rosca
@@ -104,15 +117,15 @@ with tab3:
 
 with tab4:
     #Boxsplot
-    fig4 = px.box(df_idhm_esp, y='idhm_renda', color = 'classe')
+    fig4 = px.box(df_selecao, y='idhm_renda', color = 'classe')
     fig4.update_layout(title_text="Boxsplot IDHM com o indicador de Renda")
     st.plotly_chart(fig4,  use_container_width = True)
 
     #Donut
     fig8 = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]])
-    fig8.add_trace(go.Pie(labels=df_idhm_esp['classe'], values=df_idhm_esp['idhm'], name="IDHM"),
+    fig8.add_trace(go.Pie(labels=df_selecao['classe'], values=df_selecao['idhm'], name="IDHM"),
                 1, 1)
-    fig8.add_trace(go.Pie(labels=df_idhm_esp['classe'], values=df_idhm_esp['idhm_renda'], name="IDHM Renda"),
+    fig8.add_trace(go.Pie(labels=df_selecao['classe'], values=df_selecao['idhm_renda'], name="IDHM Renda"),
                 1, 2)
     # Tamanho do buraco da rosca
     fig8.update_traces(hole=0.7, hoverinfo="label+percent+name")
